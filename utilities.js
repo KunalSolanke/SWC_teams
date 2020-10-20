@@ -1,4 +1,4 @@
-require('dotenv').config()
+
 const pass  = process.env.SERVER_PASSWORD
 
 exports.mkdir =(stream,name)=>{

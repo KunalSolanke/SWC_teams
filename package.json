@@ -16,7 +16,8 @@
     "express": "^4.17.1",
     "ssh2": "^0.8.9"
   },
-  "devdepenencies": {
+  
+  "devDependencies": {
     "morgan": "^1.10.0",
     "nodemon": "^2.0.6"
   }

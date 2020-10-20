@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWC Teams</title>
+    <link href="https://unpkg.com/tailwinducss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="grid grid-cols-1  place-items-center h-screen">
+
+        <div class="container mx-auto lg:w-1/3 md:w-1/2 sm:w-full bg-white rounded-lg p-8 flex flex-col w-full mt-10 md:mt-0  z-10">
+        <form action="/deploy" method="POST">
+          <h2 class="text-gray-900 text-lg mb-1 font-medium title-font">Deploy</h2>
+          <p class="leading-relaxed mb-5 text-gray-600">Deploy your nodejs github repo with one submit</p>
+          <input class="bg-white rounded border border-gray-400 focus:outline-none focus:border-indigo-500 text-base px-4 py-2 mb-4" placeholder="Name" type="text" name="name">
+          <input
+            class="bg-white rounded border border-gray-400 focus:outline-none focus:border-indigo-500 text-base px-4 py-2 mb-4"
+            placeholder="github repo link" type="text" name="link">
+          
+          <button class="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg" type="submit">Deploy</button>
+          <p class="text-xs text-gray-500 mt-3">Host your projects on SWC Server easily.</p>
+        </div>
+        </form>
+      </div>
+
+</body>
+</html>

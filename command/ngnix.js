@@ -10,7 +10,7 @@ const commands ={
     "cpDefault":(appType,deployname,domain="voldemort.wtf",port=3000)=>{
         return `cp ${config_files[appType]} /etc/nginx/sites-available/${deployname}.${domain}.conf`
     },
-    "enablefile": (filename) => `echo ${pass} | sudo ln -s /etc/nginx/sites-available/${filename} /etc/nginx/sites-enabled/`,
+    "enablefile": (filename) => `echo ${pass} | sudo ln -s /etc/nginx/sites-available/${filename}.conf /etc/nginx/sites-enabled/`,
     "restart":`echo ${pass} | sudo systemctl restart nginx`,
     "enable": `echo ${pass} | sudo systemctl restart nginx`,
     "add host":(domain)=>`echo '${doamin}' >> /etc/hosts`,

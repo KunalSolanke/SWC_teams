@@ -2,6 +2,18 @@ const pass  = process.env.SERVER_PASSWORD
 const {spawn} = require('child_process')
 
 
+const multiplecommands = async (commands,blockName,callback)=>{
+ 
+    for(let i=0 ;i<commands.length ;i++){
+        let c=commands[i] ;
+        try {
+        await spawnCommand(c["command"],c["name"],callback)
+        } catch (err) {
+            return callback(err, blockName)
+        }
+    }
+}
+
 
 
 const cb = function (err,name, data="") {
@@ -78,7 +90,8 @@ module.exports ={
     cb : cb,
     logger : logger,
     spawnCommand:spawnCommand,
-    commands : commands
+    commands : commands,
+    multiplecommands:multiplecommands
 }
 
 

@@ -15,9 +15,9 @@ app.get('/',(req,res)=>{
 
 
 app.post("/deploy",async (req,res)=>{
-    console.log(req.body)
-    let route = require('./deploy/node_deploy.js')
-    route.deploy(req.body)
+   
+    let appToDeploy = allDeploy.default["node"]
+    appToDeploy.deploy(req.body)
     res.redirect('/')
     
 })

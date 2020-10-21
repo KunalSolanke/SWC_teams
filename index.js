@@ -1,23 +1,26 @@
 const express = require('express')
+
+const allDeploy = require('./deploy/all_deploy.js')
 const app = express()
-
-
-
-const IntializeDeploy = require('./ssh/connection.js')
 require('dotenv').config()
 
 
 
-
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 app.get('/',(req,res)=>{
     res.sendFile('index.html',{root:__dirname})
 })
 
 
 
+
 app.post("/deploy",async (req,res)=>{
-    IntializeDeploy("node",req.body)
-    res,send("Deployed")
+    console.log(req.body)
+    let route = require('./deploy/node_deploy.js')
+    route.deploy(req.body)
+    res.sendFile('index.html', { root: __dirname })
+    
 })
 
 

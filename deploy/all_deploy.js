@@ -1,3 +1,3 @@
 exports.default ={
-    "node": ()=>require('./node_deploy.js')
+    "node": require('./node_deploy.js')
 }

@@ -19,7 +19,7 @@ app.post("/deploy",async (req,res)=>{
     console.log(req.body)
     let route = require('./deploy/node_deploy.js')
     route.deploy(req.body)
-    res.sendFile('index.html', { root: __dirname })
+   res.redirect('/')
     
 })
 

@@ -10,11 +10,8 @@ commands ={
 }
 
 
-
-
 const pm2Node = (options,env)=>{
 
-   
 
     let setup = [
         {
@@ -89,8 +86,7 @@ const deploy = async (options)=>{
     }
 
    
-
-    //await utils.spawnCommand("git clone fsfaw", "cd", utils.cb)
+    
     let basicsetup = [
         {
             "command": utils.commands["clone"](link, env.projectDir),

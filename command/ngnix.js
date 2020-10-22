@@ -5,6 +5,7 @@ const config_files = {
 
 
 const commands ={
+    
     "cpDefault":(pass,appType,filename)=>{
         return `echo ${pass} | sudo -S cp ${config_files[appType]} ${filename}`
     },

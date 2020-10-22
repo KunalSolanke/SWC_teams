@@ -77,9 +77,9 @@ commands = {
     "cd": (path) => `cd ${path}`,
     "pwd": "pwd",
     "clone": (url, name) => `git clone ${url} ${name}`,
-    "changeinfile":(pass,old,new_entry,file)=>{
+    "changeinfile":(pass,old,new_entry,file,separator="/")=>{
        // console.log(`echo ${pass} | sudo -S sed -i 's/${old}/${new_entry}/g' ${file}`)
-        return `echo ${pass} | sudo -S sed -i 's/${old}/${new_entry}/g' ${file}`},
+        return `echo ${pass} | sudo -S sed -i 's${separator}${old}${separator}${new_entry}${separator}g' ${file}`},
     "executable" : (filename) =>`chmod +x ${filename}`,
     "changeDirOwner":(pass,dir)=>`echo ${pass} | sudo -S chown -R $USER:$USER ${dir}`,
     "giveReadWriteAccess": (pass,dir) => `echo ${pass} | sudo -S chmod -R 755 ${dir}`

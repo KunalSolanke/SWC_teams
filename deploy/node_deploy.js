@@ -42,16 +42,16 @@ const nginxNode = (options,env) => {
             "name": "copy default nginx file"
         },
         
-       /*{
-            "command": utils.commands["changeinfile"](env.pass,'root', `root \/home\/kunal\/projects\/${options.name}`,nginxFilename),
-            "name": "change nginx file-root"
-        },*/
         {
-            "command": utils.commands["changeinfile"](env.pass,'3000', options.port,nginxFilename),
+            "command": utils.commands["changeinfile"](env.pass,'root', `root /home/kunal/projects/${options.name}`,nginxFilename,separator="+"),
+            "name": "change nginx file-root"
+        },
+        {
+            "command": utils.commands["changeinfile"](env.pass,'port', options.port,nginxFilename),
             "name": "change nginx file-port"
         },
         {
-            "command":utils.commands["changeinfile"](env.pass,'voldemort.wtf', options.domain,nginxFilename),
+            "command":utils.commands["changeinfile"](env.pass,'domain', options.domain,nginxFilename),
             "name": "change nginx file-domain"
         },
         {
@@ -107,6 +107,7 @@ const deploy = async (options)=>{
     ]
 
    await utils.multiplecommands(basicsetup,"NODE SETUP",utils.cb)
+  
 
 
 

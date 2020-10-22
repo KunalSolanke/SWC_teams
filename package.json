@@ -12,14 +12,15 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "chalk": "^4.1.0",
     "child_process": "^1.0.2",
     "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
     "express": "^4.17.1",
-    "nodejs-hello-world": "file:../../TEST3",
-    "shelljs": "^0.8.4",
-    "ssh2": "^0.8.9",
-    "undefined": "^0.1.0"
+    "express-ejs-layouts": "^2.5.0",
+    "mongoose": "^5.10.9",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^6.0.1"
   },
   "devDependencies": {
     "morgan": "^1.10.0",

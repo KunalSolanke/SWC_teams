@@ -16,6 +16,7 @@
     "child_process": "^1.0.2",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "nodejs-hello-world": "file:../../TEST3",
     "shelljs": "^0.8.4",
     "ssh2": "^0.8.9",
     "undefined": "^0.1.0"

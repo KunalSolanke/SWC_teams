@@ -1,12 +1,10 @@
 const utils = require('../utilities.js')
 const pm2 = require('../command/pm2.js')
 const nginx = require('../command/ngnix.js')
-const pass = process.env.SERVER_PASSWORD
-const serverBasePath = process.env.SERVER_BASE_PATH ;
 
 
 commands ={
-    "npmInstallAll" :(path)=>`npm install ${path}`,
+    "npmInstallAll" :(path)=>`cd ${path} && npm install`,
     "npmInstallPackage" : (path,name)=>`npm install ${path} ${name}`,
     "runserver" : (path,name)=>`node ${path}/${name}/index.js`
 }
@@ -14,23 +12,23 @@ commands ={
 
 
 
-const pm2Node = (options,projectDir)=>{
+const pm2Node = (options,env)=>{
 
    
 
     let setup = [
         {
-            "command": pm2.commands["start"](projectDir + "/index.js"),
+            "command": pm2.commands["start"](env.projectDir + "/index.js"),
             "name": "initiate process manager"
         },
-        {
+        /*{
             "command": pm2.commands["addtoboot"],
             "name": "add process to boot"
         },
-        {
-            "command": pm2.commands["userBoot"],
+       /* {
+            "command": pm2.commands["userBoot"](env.pass,env.server_username),
             "name": "complete startup process"
-        }
+        }*/
     ]
 
     return setup
@@ -39,30 +37,36 @@ const pm2Node = (options,projectDir)=>{
 }
 
 
-const nginxNode = (options,projectDir) => {
+const nginxNode = (options,env) => {
+    let nginxFilename = `/etc/nginx/sites-available/${options.name}.${options.domain}.conf`
     let setup = [
         {
-            "command": nginx.commands["cpDefault"]("node", options.name),
+            "command": nginx.commands["cpDefault"](env.pass,"node",nginxFilename),
             "name": "copy default nginx file"
         },
-        {
-            "command": nginx.commands["check"],
-            "name": "check nginx file"
-        },
-       /* {
-            "command": utils.commands["changeinfile"](link, projectDir),
-            "name": "check nginx file"
-        },
-        {
-            "command":utils.commands["changeinfile"](link, projectDir),
-            "name": "check nginx file"
+        
+       /*{
+            "command": utils.commands["changeinfile"](env.pass,'root', `root \/home\/kunal\/projects\/${options.name}`,nginxFilename),
+            "name": "change nginx file-root"
         },*/
         {
-            "command": utils.commands["enablefile"](options.name+".voldemort.wtf"),
+            "command": utils.commands["changeinfile"](env.pass,'3000', options.port,nginxFilename),
+            "name": "change nginx file-port"
+        },
+        {
+            "command":utils.commands["changeinfile"](env.pass,'voldemort.wtf', options.domain,nginxFilename),
+            "name": "change nginx file-domain"
+        },
+        {
+            "command": nginx.commands["check"](env.pass),
+            "name": "check nginx file"
+        },
+        {
+            "command": nginx.commands["enablefile"](env.pass,nginxFilename),
             "name": "enable file"
         },
         {
-            "command": nginx.commands["restart"],
+            "command": nginx.commands["restart"](env.pass),
             "name": "restart nginx "
         }
     ]
@@ -75,20 +79,33 @@ const nginxNode = (options,projectDir) => {
 
 const deploy = async (options)=>{
     const {name,link} =options ;
-    const projectDir = serverBasePath+name
+    options.domain = `${name}.voldemort.wtf` ;
+    const serverBasePath = process.env.SERVER_BASE_PATH;
+    options.port = 3000 ;
+    const env ={
+        pass : process.env.SERVER_PASSWORD,
+        server_username:process.env.SERVER_USERNAME,
+        projectDir: serverBasePath + name
+    }
+
+   
 
     //await utils.spawnCommand("git clone fsfaw", "cd", utils.cb)
     let basicsetup = [
         {
-            "command": utils.commands["clone"](link, projectDir),
+            "command": utils.commands["clone"](link, env.projectDir),
             "name":"clone repo"
         },
         {
-            "command": commands["npmInstallAll"](projectDir),
+            "command": utils.commands["mkdir"](`-p ${env.projectDir}/node_modules`),
+            "name": "make dir node_modules"
+        },
+        {
+            "command": commands["npmInstallAll"](`${env.projectDir}`),
             "name":"install npm packages"
         },
         {
-            "command": utils.commands["executable"](projectDir + "/index.js"),
+            "command": utils.commands["executable"](env.projectDir + "/index.js"),
             "name":"make file executable"
         }
     ]
@@ -98,10 +115,10 @@ const deploy = async (options)=>{
 
 
    //start process manager
-    await utils.multiplecommands(pm2Node(options,projectDir), "PM2 NODE SETUP", utils.cb)
+    await utils.multiplecommands(pm2Node(options,env), "PM2 NODE SETUP", utils.cb)
 
    //start nginx
-    await utils.multiplecommands(nginxNode(options, projectDir), "NGINX NODE SETUP", utils.cb)
+    await utils.multiplecommands(nginxNode(options, env), "NGINX NODE SETUP", utils.cb)
 }
 
 

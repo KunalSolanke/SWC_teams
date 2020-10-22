@@ -1,4 +1,4 @@
-const pass  = process.env.SERVER_PASSWORD
+
 const {spawn} = require('child_process')
 
 
@@ -71,16 +71,18 @@ const logger = async (child,name)=>{
 
 
 commands = {
-    "install": (name) => `echo ${pass} | sudo -S apt-get install ${name}`,
-    "update": `echo ${pass} | sudo -S apt-get update`,
-    "mdkir": (name) => `mkdir ${name}`,
+    "install": (pass,name) => `echo ${pass} | sudo -S apt-get install ${name}`,
+    "update": (pass)=>`echo ${pass} | sudo -S apt-get update`,
+    "mkdir": (name) => `mkdir ${name}`,
     "cd": (path) => `cd ${path}`,
     "pwd": "pwd",
     "clone": (url, name) => `git clone ${url} ${name}`,
-    "changeinfile":(old,entry,file)=>`sed -i 's/${old}/${entry}/g' ${file} `,
+    "changeinfile":(pass,old,new_entry,file)=>{
+       // console.log(`echo ${pass} | sudo -S sed -i 's/${old}/${new_entry}/g' ${file}`)
+        return `echo ${pass} | sudo -S sed -i 's/${old}/${new_entry}/g' ${file}`},
     "executable" : (filename) =>`chmod +x ${filename}`,
-    "changeDirOwner":(dir)=>`echo ${pass} | sudo chown -R $USER:$USER ${dir}`,
-    "giveReadWriteAccess": (dir) => `echo ${pass} | sudo chmod -R 755 ${dir}`
+    "changeDirOwner":(pass,dir)=>`echo ${pass} | sudo -S chown -R $USER:$USER ${dir}`,
+    "giveReadWriteAccess": (pass,dir) => `echo ${pass} | sudo -S chmod -R 755 ${dir}`
 }
 
 

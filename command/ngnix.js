@@ -1,19 +1,18 @@
 const path = require('path')
 const config_files = {
-    "node" :path.join(__dirname,'nginx_config/node.conf') 
+    "node" :'/home/kunal/projects/VimProjects/SWC_Teams/nginx_config/node.conf'
 }
-const pass = process.env.SERVER_PASSWORD
-
 
 
 const commands ={
-    "cpDefault":(appType,deployname,domain="voldemort.wtf",port=3000)=>{
-        return `cp ${config_files[appType]} /etc/nginx/sites-available/${deployname}.${domain}.conf`
+    "cpDefault":(pass,appType,filename)=>{
+        return `echo ${pass} | sudo -S cp ${config_files[appType]} ${filename}`
     },
-    "enablefile": (filename) => `echo ${pass} | sudo ln -s /etc/nginx/sites-available/${filename}.conf /etc/nginx/sites-enabled/`,
-    "restart":`echo ${pass} | sudo systemctl restart nginx`,
-    "enable": `echo ${pass} | sudo systemctl restart nginx`,
-    "add host":(domain)=>`echo '${doamin}' >> /etc/hosts`,
-    "check" : "ngnix -t"
+    "enablefile": (pass,filename) => `echo ${pass} | sudo ln -s ${filename} /etc/nginx/sites-enabled/`,
+    "restart":(pass)=>`echo ${pass} | sudo -S systemctl restart nginx`,
+    "enable": (pass)=>`echo ${pass} | sudo -S systemctl enable nginx`,
+    "add host":(domain)=>`echo '${domain}' >> /etc/hosts`,
+    "check" : (pass)=>`echo ${pass} | sudo -S nginx -t`
 }
 
+exports.commands = commands 

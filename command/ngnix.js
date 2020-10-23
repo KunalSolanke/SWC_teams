@@ -1,6 +1,6 @@
 const path = require('path')
 const config_files = {
-    "node" :'/home/kunal/projects/VimProjects/SWC_Teams/nginx_config/node.conf'
+    "node" :'nginx_config/node.conf'
 }
 
 

@@ -3,6 +3,7 @@ const pm2 = require('../command/pm2.js')
 const nginx = require('../command/ngnix.js')
 
 
+
 commands ={
     "npmInstallAll" :(path)=>`cd ${path} && npm install`,
     "npmInstallPackage" : (path,name)=>`npm install ${path} ${name}`,
@@ -42,7 +43,7 @@ const nginxNode = (options,env) => {
             "name": "copy default nginx file"
         },
         
-        {
+       {
             "command": utils.commands["changeinfile"](env.pass,'root', `root /home/kunal/projects/${options.name}`,nginxFilename,separator="+"),
             "name": "change nginx file-root"
         },

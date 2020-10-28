@@ -4,10 +4,11 @@ const path = require('path')
 const app = express()
 var logger = require('morgan');
 const db = require('./db/db') ;
-const {User}=require('./models/allModels.js')
+const {User,Project}=require('./models/allModels.js')
 const LocalStrategy = require("passport-local");
 const passport = require('passport')
 const session = require('express-session')
+const {images} = require('./command/docker.js')
 var expressejsLayout = require('express-ejs-layouts')
 
 
@@ -88,18 +89,155 @@ app.get('/',(req,res)=>{
 
 
 
-app.get('/deploy',isLoggedin, (req, res) => {
+
+
+app.get('/test', (req, res) => {
+    res.render("test")
+})
+
+
+app.get('/test2', (req, res) => {
+    res.render("projectdetails")
+})
+
+
+app.get('/create-project', (req, res) => {
     res.render("deployPage")
 })
 
 
 
 
-app.post("/deploy",isLoggedin,async (req,res)=>{
-    let appToDeploy = allDeploy.default["node"]
-    appToDeploy.deploy(req.body)
-    res.redirect('/')
+
+
+app.post("/create-project",isLoggedin,async (req,res)=>{
     
+    let {name,link,platfrom,domain} = req.body ;
+    if(domain === ""){
+        domain = name +'.voldemort.wtf'
+    }
+    let project = await new Project({name:name,repoUrl:link,user :req.user._id,platfrom:platfrom,domain:domain,version:1})
+
+    res.redirect(`/project/${project._id}`)
+    
+})
+
+
+
+
+
+app.get("/project/:id",async (req,res)=>{
+    const projectId = req.query.id 
+    const project = await (await Project.findById(projectId)).populated('user').populate('databases').execPopulate();
+
+
+
+    let databases = [{
+        "name" : "MongoDb",
+        "desciption" : "NoSQL database",
+         "image" : "",
+         "formname":"mongo"
+      },
+        {
+            "name": "PostgresDb",
+            "desciption": "SQL database",
+            "image": "",
+            "formname": "postgres"
+        }
+]
+
+    res.render("projectdetails",{"project":project,"databases":databases})
+})
+
+
+
+
+
+
+
+
+app.post("/project/:id/databases",async (req,res)=>{
+    const projectId = req.query.id 
+    const project = await Project.findById(projectId).populated('user').populate('databases').execPopulate() ;
+
+   
+
+  for (const [k,v] of Object.entries(req.body)){
+
+    if(k=="DBCONFIGURED"){
+        if(v){
+            project.databaseConfigured = true ;
+            project.save()
+        }
+
+    }else{
+        if(v){
+              await images[k](project)
+        }
+    }
+
+    
+  }
+})
+
+
+
+
+
+
+
+
+app.post("/project/:id/config", async (req, res) => {
+    let { key,value} = req.body;
+    const projectId = req.query.id 
+    const project = await Project.findById(projectId).populated('user').populate('databases').execPopulate() ;
+    
+    try{
+    project.config = project.config.concat([{
+        key : key,
+        value : value
+    }])
+    await project.save()
+
+    res.send("config_added")
+    }catch(e){
+        res.json({
+            "error" : e
+        })
+}
+    
+})
+
+
+app.post("/project/:id", async (req, res) => {
+    const projectId = req.query.id
+    const project = await Project.findById(projectId).populated('user').populate('databases').execPopulate();
+    if (!project.databaseConfigured) {
+        res.send("can't deploy")
+    }
+    try {
+        let appToDeploy = allDeploy.default["node"]
+        appToDeploy.deploy(project)
+    } catch (err) {
+        console.log(err)
+        res.json({
+            "error": err
+        })
+    }
+
+})
+
+
+
+
+
+
+
+
+// project pages 
+
+app.get("/myprojects",isLoggedin,async (req,res)=>{
+    res.render("projects")
 })
 
 
@@ -119,9 +257,19 @@ app.get('/logout',(req,res)=>{
 })
 
 
+
+
+
+
+
 app.get("/accounts/register", function (req, res) {
     res.render("register");
 });
+
+
+
+
+
 
 
 
@@ -132,19 +280,25 @@ app.post("/accounts/register", function (req, res) {
         password, function (err, user) {
             if (err) {
                 console.log(err);
-                return res.render("register");
+                return res.redirect("/accounts/register");
             }
 
             passport.authenticate("local")(
                 req, res, function () {
-                    res.render("deployPage");
+                    res.redirect('/create-project');
                 });
         });
 });
 
 
 
-//Showing login form 
+
+
+
+
+
+//Showing login form const LocalStrategy = require("passport-local");
+
 app.get("/accounts/login", function (req, res) {
     res.render("login");
 });
@@ -153,11 +307,15 @@ app.get("/accounts/login", function (req, res) {
 
 //Handling user login 
 app.post("/accounts/login", passport.authenticate("local", {
-    successRedirect: "/deploy",
-    failureRedirect: "/account/login"
+    successRedirect: "/create-project",
+    failureRedirect: "/accounts/login"
 }), function (req, res) {
     console.log(req.user)
 }); 
+
+
+
+
 
 
 function isLoggedin(req,res,next){
@@ -167,6 +325,9 @@ function isLoggedin(req,res,next){
     }else{
     res.redirect('/accounts/login')}
 }
+
+
+
 
 
 

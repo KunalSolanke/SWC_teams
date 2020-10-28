@@ -5,44 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWC Teams</title>
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="http://localhost:8000/static/style.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </head>
-<body class="min-h-screen flex flex-col">
-<header class="text-gray-700 body-font">
-    <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-        <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round"
-                stroke-linejoin="round" stroke-width="2" class="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full"
-                viewBox="0 0 24 24">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-            </svg>
-            <span class="ml-3 text-xl">SWC-Teams</span>
-        </a>
-        <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center">
-            <a href="/deploy" class="mr-5 hover:text-gray-900">Deploy</a>
-            <% if (!user) { %>
-            <a href="/accounts/login" class="mr-5 hover:text-gray-900">Login</a>
-            <a href="/accounts/register" class="mr-5 hover:text-gray-900">Signup</a>
-            <% } else { %>
-                <a href="#" class="mr-5 hover:text-gray-900"><%= user.username %></a>
-                
-                <a href="/logout" class="mr-5 hover:text-gray-900">Logout</a>
-            
-            <% } %>
-            
-            
-        </nav>
-        <!-- <button
-            class="inline-flex items-center bg-gray-200 border-0 py-1 px-3 focus:outline-none hover:bg-gray-300 rounded text-base mt-4 md:mt-0">Button
-            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                class="w-4 h-4 ml-1" viewBox="0 0 24 24">
-                <path d="M5 12h14M12 5l7 7-7 7"></path>
-            </svg>
-        </button> -->
-    </div>
-</header>
-
-
+<body class="d-flex flex-column">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
+        <a class="navbar-brand" href="#">SWC Teams</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/create-project">Create Project <span class="sr-only">(current)</span></a>
+            </li>
+                <% if (!user) { %>
+                    <li class="nav-item">
+                        <a href="/accounts/login" class="nav-link" >Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/accounts/register" class="nav-link" >Sign up</a>
+                    </li>
+                    <% } else { %>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" ><%= user.username %></a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/logout" class="nav-link" >Logout</a>
+                        </li>
+                    <% } %>
+          </ul>
+        </div>
+      </nav>
 <%- body %>
 
 </body>

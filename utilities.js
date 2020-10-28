@@ -30,12 +30,10 @@ const spawnCommand  = async(command,commandname,cb)=>{
     try {
         let data = await logger(child, commandname)
         cb(null, commandname, data)
-
     } catch (error) {
         console.log(error)
         return cb(error, commandname);
     }
-
 }
 
 

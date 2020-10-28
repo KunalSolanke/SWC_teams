@@ -12,7 +12,7 @@ const UserSchema = mongoose.Schema({
     },
     password: {
         type: String,
-        minLength: 8
+        minLength: 6
     },
 }, {
     timestamps: true

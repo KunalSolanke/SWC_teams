@@ -14,6 +14,7 @@ var expressejsLayout = require('express-ejs-layouts')
 
 
 
+
 //env
 require('dotenv').config()
 
@@ -91,9 +92,9 @@ app.get('/',(req,res)=>{
 
 
 
-app.get('/test', (req, res) => {
-    res.render("test")
-})
+// app.get('/test', (req, res) => {
+//     res.render("test")
+// })
 
 
 app.get('/test2', (req, res) => {

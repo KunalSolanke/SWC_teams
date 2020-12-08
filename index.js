@@ -72,9 +72,7 @@ ROUTES
 //bind user to response
 app.use((req, res, next) => {
     try {
-        
         res.locals.user = req.user || null;
-        
         next()
     } catch {
         res.send("Error")

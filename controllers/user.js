@@ -16,7 +16,7 @@ exports.logout = (req,res)=>{
     if(req.user){
         req.logout()
     }
-
+    res.setHeader("Content-Type", "text/html")
     res.redirect('/accounts/login')
 }
 

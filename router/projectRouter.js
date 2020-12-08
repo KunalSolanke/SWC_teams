@@ -4,9 +4,10 @@ const isLoggedin = require('../middlewares/auth') ;
 
 router.use(isLoggedin) ;
 
-router.route('/create').get(controller.getCreateProject).post(controller.postCreateProject) ;
 
-router.route('/:id').get(controller.getProject).post(controller.postProject);router.post('/:id/databases',controller.postDatabase) ;
+router.route('/create').post(controller.postCreateProject).get(controller.getCreateProject) ;
+router.route('/:id').post(controller.postProject).get(controller.getProject);
+router.post('/:id/databases',controller.postDatabase) ;
 router.post('/:id/config',controller.postConfig) ;
 
 

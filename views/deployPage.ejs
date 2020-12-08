@@ -143,7 +143,7 @@ background-color: #3b5998;
       <div class="card card-signin my-5">
         <div class="card-body">
           <h5 class="card-title text-center">Deploy your Project</h5>
-          <form class="form-signin" action="/project/create" method ="post">
+          <form class="form-signin" action="/project/create/" method ="post">
             <div class="form-label-group">
               <input type="text" id="name" name="name" class="form-control" placeholder="Name" required autofocus>
               <label for="name">Name</label>
@@ -160,8 +160,8 @@ background-color: #3b5998;
             </div>
 
             <div class="form-label-group">
-                <select id="platform" style="border-radius: 2rem;height: 51px;" class="browser-default custom-select">
-                    <option selected >Node js</option>
+                <select id="platform" style="border-radius: 2rem;height: 51px;" class="browser-default custom-select" name="platform">
+                    <option selected value="0">Node js</option>
                     <option value="1">Django</option>
                     <option value="2">React</option>
                     <option value="3">Three</option>
@@ -170,7 +170,7 @@ background-color: #3b5998;
 
             <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Go Ahead</button>
             <hr class="my-4">
-            <button class="btn btn-lg btn-google btn-block text-uppercase" type="submit"><i class="fab fa-google mr-2"></i> Create a Repo for me</button>
+            <button class="btn btn-lg btn-google btn-block text-uppercase"><i class="fab fa-google mr-2"></i> Create a Repo for me</button>
           </form>
         </div>
       </div>

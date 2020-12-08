@@ -6,7 +6,7 @@ const isLoggedin = require('../middlewares/auth') ;
 //userAuth
 router.route('/login').get(controller.getLogin).post(controller.postLogin) ;
 router.route('/register').get(controller.getSignup).post(controller.postSignup) ;
-router.get('/logout',controller.logout) ;
+router.post('/logout',controller.logout) ;
 
 console.log(isLoggedin) ;
 //userInfo

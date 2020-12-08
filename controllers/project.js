@@ -1,47 +1,61 @@
 const {Project } = require('../models/allModels') ;
 const {images} = require('../command/docker.js')
-const allDeploy = require('../deploy/all_deploy.js')
+const allDeploy = require('../deploy/all_deploy.js');
+const { postProfile } = require('./user');
 
 
 
 //post request for create project page with initial page info 
-exports.postCreateProject = async (req,res)=>{
+exports.postCreateProject = function (req,res){
     
-    let {name,link,platfrom,domain} = req.body ;
+    let {name,link,platform,domain} = req.body ;
+    console.log(req.body) ;
     if(domain === ""){
         domain = name +'.voldemort.wtf'
     }
-    let project = await new Project({name:name,repoUrl:link,user :req.user._id,platfrom:platfrom,domain:domain,version:1})
+    let project =new  Project({name:name,repoUrl:link,user :req.user._id,platform:platform,domain:domain,version:1})
+    project.save(function(err){
+        console.log(err)
+    })
+  
+   console.log(project._id);
+    res.setHeader("Content-Type", "text/html")
+    res.redirect(`/project/${project._id}`) ;
 
-    res.redirect(`/project/${project._id}`)
-    
 }
 
 
 
 
 //render project project with project_id
-exports.getProject =async (req,res)=>{
-    const projectId = req.query.id 
-    const project = await (await Project.findById(projectId)).populate('user').populate('databases').execPopulate();
+exports.getProject =function (req,res){
+    const projectId = req.params.id ;
+    console.log(req) ;
+    console.log(projectId) ;
 
-
-
-    let databases = [{
-        "name" : "MongoDb",
-        "desciption" : "NoSQL database",
-         "image" : "",
-         "formname":"mongo"
-      },
+    Project.findById(projectId).then(project=>{
+      
+        console.log(project)
+        console.log(project.user);
+        project.populate('user').execPopulate() ;
+        let databases = [{
+            "name": "MongoDb",
+            "desciption": "NoSQL database",
+            "image": "",
+            "formname": "mongo"
+        },
         {
             "name": "PostgresDb",
             "desciption": "SQL database",
             "image": "",
             "formname": "postgres"
         }
-]
+        ]
 
-    res.render("projectdetails",{"project":project,"databases":databases})
+        res.render("projectdetails", { "project": project, "databases": databases })
+
+    }) ;
+   
 }
 
 
@@ -52,7 +66,7 @@ exports.getProject =async (req,res)=>{
 
 //configuring project with databaseConfigurtions
 exports.postDatabase = async (req,res)=>{
-    const projectId = req.query.id 
+    const projectId = req.params.id 
     const project = await Project.findById(projectId).populated('user').populate('databases').execPopulate() ;
 
    
@@ -84,7 +98,7 @@ exports.postDatabase = async (req,res)=>{
 //project config variabeles
 exports.postConfig =  async (req, res) => {
     let { key,value} = req.body;
-    const projectId = req.query.id 
+    const projectId = req.params.id 
     const project = await Project.findById(projectId).populated('user').populate('databases').execPopulate() ;
     
     try{
@@ -108,7 +122,7 @@ exports.postConfig =  async (req, res) => {
 
 //finally deploy the project with above configurations
 exports.postProject = async (req, res) => {
-    const projectId = req.query.id
+    const projectId = req.params.id ;
     const project = await Project.findById(projectId).populated('user').populate('databases').execPopulate();
     if (!project.databaseConfigured) {
         res.send("can't deploy")

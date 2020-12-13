@@ -81,6 +81,9 @@ const nginxNode = (project, env) => {
 }
 
 
+
+
+
 const dockersetup = async (project, env) => {
 
     let dockerfilename = env.projectDir + "/Dockerfile"
@@ -117,6 +120,8 @@ const saveconfigurations = (project, env) => {
         "name": "make .env file"
     }]
 
+    
+
     for (let config of project.configs) {
 
         setup.push({
@@ -136,6 +141,7 @@ const saveconfigurations = (project, env) => {
 
 
 }
+
 
 
 const dockerBuild = async (project, env) => {
@@ -160,6 +166,8 @@ const dockerBuild = async (project, env) => {
 
     return setup;
 }
+
+
 
 
 
@@ -238,6 +246,11 @@ const deploy = async (project) => {
     //start nginx
     await utils.multiplecommands(nginxNode(project, env), "NGINX NODE SETUP", utils.cb)
 }
+
+
+
+
+
 
 
 

@@ -63,6 +63,8 @@ exports.postLogin = passport.authenticate("local", {
     console.log(req.user)
 }; 
 
+
+
 exports.getProfile = async(req,res) =>{
 	res.send("under construction") ;
 }

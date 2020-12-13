@@ -2,6 +2,7 @@
 const {spawn} = require('child_process')
 
 
+
 const multiplecommands = async (commands,blockName,callback)=>{
  
     for(let i=0 ;i<commands.length ;i++){
@@ -16,11 +17,17 @@ const multiplecommands = async (commands,blockName,callback)=>{
 
 
 
+
+
 const cb = function (err,name, data="") {
     if (err) throw err;
     console.log(`${name}\ndata ` + data +"\n"+ "error " + err)
 
 }
+
+
+
+
 
 
 const spawnCommand  = async(command,commandname,cb)=>{
@@ -35,6 +42,8 @@ const spawnCommand  = async(command,commandname,cb)=>{
         return cb(error, commandname);
     }
 }
+
+
 
 
 
@@ -68,6 +77,8 @@ const logger = async (child,name)=>{
 
 
 
+
+
 commands = {
     "install": (pass,name) => `echo ${pass} | sudo -S apt-get install ${name}`,
     "update": (pass)=>`echo ${pass} | sudo -S apt-get update`,
@@ -82,6 +93,9 @@ commands = {
     "changeDirOwner":(pass,dir)=>`echo ${pass} | sudo -S chown -R $USER:$USER ${dir}`,
     "giveReadWriteAccess": (pass,dir) => `echo ${pass} | sudo -S chmod -R 755 ${dir}`
 }
+
+
+
 
 
 

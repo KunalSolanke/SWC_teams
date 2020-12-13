@@ -5,11 +5,11 @@ const { postProfile } = require('./user');
 
 
 
+
+
 //post request for create project page with initial page info 
 exports.postCreateProject = function (req,res){
-    
     let {name,link,platform,domain} = req.body ;
-    console.log(req.body) ;
     if(domain === ""){
         domain = name +'.voldemort.wtf'
     }
@@ -18,7 +18,7 @@ exports.postCreateProject = function (req,res){
         console.log(err)
     })
   
-   console.log(project._id);
+   
     res.setHeader("Content-Type", "text/html")
     res.redirect(`/project/${project._id}`) ;
 
@@ -27,17 +27,25 @@ exports.postCreateProject = function (req,res){
 
 
 
+
+
+
+
+
+
+
+
+
+
 //render project project with project_id
 exports.getProject =function (req,res){
     const projectId = req.params.id ;
-    console.log(req) ;
-    console.log(projectId) ;
-
+    
     Project.findById(projectId).then(project=>{
       
-        console.log(project)
-        console.log(project.user);
+        
         project.populate('user').execPopulate() ;
+
         let databases = [{
             "name": "MongoDb",
             "desciption": "NoSQL database",
@@ -64,13 +72,23 @@ exports.getProject =function (req,res){
 
 
 
+
+
+
+
+
 //configuring project with databaseConfigurtions
 exports.postDatabase = async (req,res)=>{
     const projectId = req.params.id 
-    const project = await Project.findById(projectId).populated('user').populate('databases').execPopulate() ;
+    const project = await Project.findById(projectId) ;
+    await project.populate('user').execPopulate() ;
+    await project.populate('databases').execPopulate() ;
+    
 
-   
+  {
 
+  }
+  console.log(req.body)
   for (const [k,v] of Object.entries(req.body)){
 
     if(k=="DBCONFIGURED"){
@@ -80,6 +98,7 @@ exports.postDatabase = async (req,res)=>{
         }
 
     }else{
+    
         if(v){
               await images[k](project)
         }
@@ -95,26 +114,87 @@ exports.postDatabase = async (req,res)=>{
 
 
 
+
+
+
+
+
 //project config variabeles
 exports.postConfig =  async (req, res) => {
-    let { key,value} = req.body;
+    let {key,value} = req.body ;
+   
     const projectId = req.params.id 
-    const project = await Project.findById(projectId).populated('user').populate('databases').execPopulate() ;
+    const project = await Project.findById(projectId)
     
     try{
-    project.config = project.config.concat([{
+    project.config_vars = project.config_vars.concat([{
         key : key,
         value : value
     }])
     await project.save()
+        res.json({
+            "success": true,
+            "message": "configuration update",
+            "status": 200
+        })
 
-    res.send("config_added")
     }catch(e){
         res.json({
             "error" : e
         })
+    }
 }
+
+
+
+
+exports.updateConfig = async (req,res)=>{
+    let {key,value} = req.body ;
+    const projectId = req.params.id 
+    const project = await Project.findById(projectId)
     
+    try{
+        project.config_vars.forEach(obj => {
+            if(obj.key==key)obj.value = value ;
+        });
+
+    await project.save()
+    res.json({
+        "success":true,
+        "message":"configuration update",
+        "status":200
+    })
+
+    }catch(e){
+        res.status(400).json({
+            "error" : e
+        })
+    }
+}
+
+
+
+
+exports.deleteConfig = async (req,res)=>{
+    let {key,value} = req.body;
+    const projectId = req.params.id 
+    const project = await Project.findById(projectId)
+    try{
+        project.config_vars = project.config_vars.filter((obj) => {
+            return !(obj.key==key)
+        });
+
+    await project.save()
+        res.json({
+            "success": true,
+            "message": "configuration update",
+            "status": 200
+        })
+    }catch(e){
+        res.json({
+            "error" : e
+        })
+    }
 }
 
 

@@ -10,7 +10,6 @@ router.get('/',(req,res)=>{
 })
 
 
-
 router.get('/test', (req, res) => {
     res.render("test")
 })
@@ -18,9 +17,6 @@ router.get('/test', (req, res) => {
 router.get('/test2', (req, res) => {
     res.render("projectdetails")
 })
-
-
-
 
 router.use('/accounts',userRouter) ;
 router.use('/project',projectRouter) ;

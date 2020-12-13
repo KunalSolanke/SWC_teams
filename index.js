@@ -9,6 +9,7 @@ const passport = require('passport')
 const session = require('express-session')
 const expressejsLayout = require('express-ejs-layouts')
 const helmet = require('helmet') ;
+const cors = require('cors');
 
 
 
@@ -25,6 +26,13 @@ app.use(helmet()) ;
 app.use('/static',express.static(path.join(__dirname, 'public')));
 
 
+
+app.options('*', cors())
+
+app.use(cors({
+    origin : '*',
+    allowedHeaders :'*'
+}))
 
 
 

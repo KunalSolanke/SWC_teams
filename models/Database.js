@@ -19,7 +19,7 @@ project: {
      type : String,
      required: true
  },
- configs_to_add  :[
+ configs  :[
      {
          key : String,
          value : String

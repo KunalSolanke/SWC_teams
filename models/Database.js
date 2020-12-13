@@ -4,9 +4,11 @@ const DatabaseSchmea = mongoose.Schema({
  name : {
      type:String,
      required:true,
-     unique : true
  },
- containername :String,
+ containername :{
+     type : String,
+     required : true ,
+ },
  user : {
      ref : 'User',
      type : mongoose.Schema.Types.ObjectId

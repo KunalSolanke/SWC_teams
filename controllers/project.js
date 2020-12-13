@@ -100,7 +100,18 @@ exports.postDatabase = async (req,res)=>{
     }else{
     
         if(v){
-              await images[k](project)
+            try{
+              await images[k](project) ;
+            }catch(err)
+            {
+
+                console.log(err)
+                res.status(400).json({
+                    "success":false ,
+                    "message":err.message
+                })
+                if(err) throw err ;
+            }
         }
     }
 

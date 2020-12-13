@@ -3,12 +3,31 @@ const {Database} = require('../models/allModels.js')
 
 
 let commands = {
-    "createVolume" : (name)=>`docker volume create ${name}`,
-    "dockerBuildContext":(version,name)=>`docker build -t ${name}:${version} .`,
+    "createVolume" : (name)=>{
+        let obj ={}
+        obj["normal"]=`docker volume create ${name}` ;
+        obj["revert"] = `docker volume rm /${name}` ;
+        return obj
+    },
+    "dockerBuildContext":(version,name)=>{
+        let obj = {}
+        obj["normal"]=`docker build -t ${name}:${version} .`;
+        obj["revert"]=`docker rm -f /${name}`;
+        return obj;
+    },
     "dockerRun" : 
-    (contianername,portin,portto,image,string) =>
-    {return `docker run -it --rm -d -p  ${string} ${portin}:${portto} --name ${contianername} ${image}`},
-    "dockerList" : "docker ps"   
+    (options,container) =>{
+        let obj = {}
+        obj["normal"]=`docker run ${options}`
+        obj["revert"] = `docker rm -f /${container}`
+        return obj
+    },
+    "dockerList" : ()=>{
+        let obj = {};
+        obj["normal"]="docker ps"
+        obj["revert"] =""
+        return obj
+    }   
 }
 
 
@@ -23,6 +42,7 @@ dockerimages = {
         
         await  utils.spawnCommand(commands["createVolume"](volumeName),"create pg vol",utils.cb) ;
         
+        /*pending*/
         await utils.spawnCommand(`docker run -it --rm -d \
         --name ${containername} \
         -p ${port}:5432 \
@@ -66,8 +86,10 @@ dockerimages = {
 
 
 
-    "mongo": async (project) => {
 
+    
+    "mongo": async (project) => {
+        //mongo 
         let containername = "mongo_"+project.name ;
         let volumeName = 'mongodb_' + project.name;
         containername.toLowerCase();
@@ -77,26 +99,35 @@ dockerimages = {
         volumeConfig.toLowerCase();
         let totalMongoDb = await Database.find({ name: "mongo" }).exec() ;
         let port = 27017 + totalMongoDb.length ;
-        await utils.spawnCommand(commands["createVolume"](volumeName), "create mongo vol ", utils.cb);
-        await utils.spawnCommand(commands["createVolume"](volumeConfig), "create mongo config vol ", utils.cb);
-        await utils.spawnCommand(`docker run -dit --rm --name ${containername} -p ${port}:27017 mongo`, `mongo container ${project.name}`, utils.cb)
-        
-        
-      let database = await new Database({ project: project._id, user: project.user._id, containername: containername, name: "mongo", port: port
-    ,type : "NOSQL"})
-        
-    console.log(database.configs , database) ;
-    database.configs.push({key : "DATABASE_URI",value :`${containername}:${port}`})
-    database.save()
-    
+        let fallbackArr = []
+        try{
+                await utils.spawnCommand(commands["createVolume"](volumeName), "create mongo vol ", utils.cb,fallbackArr);
+                await utils.spawnCommand(commands["createVolume"](volumeConfig), "create mongo config vol ",utils.cb,fallbackArr);
+                await utils.spawnCommand(commands['dockerRun'](`-dit --rm --name ${containername} -p ${port}:27017 mongo`,containername), `mongo container ${project.name}`, utils.cb,fallbackArr)
+            
+        }catch(err){
+            console.log("reverting changes",err)
+            await utils.multiplecommands(fallbackArr,"mongo db creation block ",(err,name)=>{
+              console.log(err)
+          }) ;
+          if(err)throw err ;
+        }
 
-    project.databases.push(database._id)
-    project.config_vars.push({ key: "DATABASE_URI", value: `${containername}:${port}` })
-    project.save()
+        
+        let database = await new Database({
+            project: project._id, user: project.user._id, containername: containername, name: "mongo", port: port
+            , type: "NOSQL"
+        })
 
 
+        console.log(database.configs, database);
+        database.configs.push({ key: "DATABASE_URI", value: `${containername}:${port}` })
+        database
+
+        project.databases.push(database._id)
+        project.config_vars.push({ key: "DATABASE_URI", value: `${containername}:${port}` })
+        project.save()
     }
-
 
 
 

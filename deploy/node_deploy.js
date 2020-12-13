@@ -189,26 +189,6 @@ const deploy = async (project) => {
 
 
 
-    // let basicsetup = [
-    //     {
-    //         "command": utils.commands["clone"](link, env.projectDir),
-    //         "name":"clone repo"
-    //     },
-    //     {
-    //         "command": utils.commands["mkdir"](`-p ${env.projectDir}/node_modules`),
-    //         "name": "make dir node_modules"
-    //     },
-    //     {
-    //         "command": commands["npmInstallAll"](`${env.projectDir}`),
-    //         "name":"install npm packages"
-    //     },
-    //     {
-    //         "command": utils.commands["executable"](env.projectDir + "/index.js"),
-    //         "name":"make file executable"
-    //     }
-    // ]
-
-
     let basicsetup = [
         {
             "command": utils.commands["mkdir"](`-p ${env.projectDir}`),
@@ -225,26 +205,34 @@ const deploy = async (project) => {
 
     ]
 
-    await utils.multiplecommands(basicsetup, "NODE SETUP", utils.cb)
+    let fallbackArr =[] ;
 
+    try{
 
-    //docker 
-    await utils.multiplecommands(dockersetup(project, env), "DOCKER SETUP", utils.cb)
+            await utils.multiplecommands(basicsetup, "NODE SETUP", utils.cb,fallbackArr)
 
+            //docker
+            await utils.multiplecommands(dockersetup(project, env), "DOCKER SETUP", utils.cb,fallbackArr)
 
-    //save configurations 
-    await utils.multiplecommands(saveconfigurations(project, env), "DOCKER SETUP", utils.cb)
+            //save configurations 
+            await utils.multiplecommands(saveconfigurations(project, env), "DOCKER SETUP", utils.cb,fallbackArr)
 
+            //docker 
+            await utils.multiplecommands(dockerBuild(project, env), "DOCKER BUILD", utils.cb,fallbackArr)
 
+            //start process manager
+            //  await utils.multiplecommands(pm2Node(project,env), "PM2 NODE SETUP", utils.cb)
 
-    //docker 
-    await utils.multiplecommands(dockerBuild(project, env), "DOCKER BUILD", utils.cb)
-
-    //start process manager
-    //  await utils.multiplecommands(pm2Node(project,env), "PM2 NODE SETUP", utils.cb)
-
-    //start nginx
-    await utils.multiplecommands(nginxNode(project, env), "NGINX NODE SETUP", utils.cb)
+            //start nginx
+            await utils.multiplecommands(nginxNode(project, env), "NGINX NODE SETUP", utils.cb,fallbackArr) ;
+            
+    } catch (err) {
+        console.log("reverting changes", err)
+        await utils.multiplecommands(fallbackArr, "mongo db creation block ", (err, name) => {
+            console.log(err)
+        });
+        if (err) throw err;
+    }
 }
 
 

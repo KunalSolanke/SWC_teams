@@ -3,12 +3,13 @@ const {spawn} = require('child_process')
 
 
 
-const multiplecommands = async (commands,blockName,callback)=>{
- 
+const multiplecommands = async (commands,blockName,callback,fallbackcommandArr=[])=>{
+
     for(let i=0 ;i<commands.length ;i++){
         let c=commands[i] ;
         try {
-        await spawnCommand(c["command"],c["name"],callback)
+        await spawnCommand({"normal":c["command"]},c["name"],callback,fallbackcommandArr)
+
         } catch (err) {
             return callback(err, blockName)
         }
@@ -20,25 +21,31 @@ const multiplecommands = async (commands,blockName,callback)=>{
 
 
 const cb = function (err,name, data="") {
-    if (err) throw err;
-    console.log(`${name}\ndata ` + data +"\n"+ "error " + err)
-
+    if (err) {
+        console.log(err);
+        return ;
+    }
+    console.log(`${name}\ndata ` + data +"\n")
 }
 
 
 
 
-
-
-const spawnCommand  = async(command,commandname,cb)=>{
-    let child = spawn(command, {
+const spawnCommand  = async(command,commandname,cb,fallbackcommandArr)=>{
+    console.log("running ",command.normal,commandname)
+    let child = spawn(command.normal, {
         shell: true,
     })
+    
     try {
         let data = await logger(child, commandname)
+        fallbackcommandArr.push({
+         "command":  command.revert,
+         "name" :`${commandname} revert`
+        })
         cb(null, commandname, data)
     } catch (error) {
-        console.log(error)
+        console.log(error , "error in", command.normal)
         return cb(error, commandname);
     }
 }

@@ -10,8 +10,8 @@ const session = require('express-session')
 const expressejsLayout = require('express-ejs-layouts')
 const helmet = require('helmet') ;
 const cors = require('cors');
-
-
+const colors = require('colors') ;
+colors.enable() ;
 
 
 //env

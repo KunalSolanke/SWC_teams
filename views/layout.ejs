@@ -2,50 +2,53 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SWC Teams</title>
-   
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-     
-   
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="/static/js/bootstrap.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWC Teams</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/js/bootstrap.min.css">
 </head>
+
 <body class="d-flex flex-column">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
-        <a class="navbar-brand" href="#">SWC Teams</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="/project/create">Create Project <span class="sr-only">(current)</span></a>
-            </li>
-                <% if (!user) { %>
-                    <li class="nav-item">
-                        <a href="/accounts/login" class="nav-link" >Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/accounts/register" class="nav-link" >Sign up</a>
-                    </li>
-                    <% } else { %>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" ><%= user.username %></a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/accounts/logout" class="nav-link" >Logout</a>
-                        </li>
-                    <% } %>
-          </ul>
-        </div>
-      </nav>
-<%- body %>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
+    <a class="navbar-brand" href="#">SWC Teams</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/project/create">Create Project <span class="sr-only">(current)</span></a>
+        </li>
+        <% if (!user) { %>
+        <li class="nav-item">
+          <a href="/accounts/login" class="nav-link">Login</a>
+        </li>
+        <li class="nav-item">
+          <a href="/accounts/register" class="nav-link">Sign up</a>
+        </li>
+        <% } else { %>
+        <li class="nav-item">
+          <a href="#" class="nav-link"><%= user.username %></a>
+        </li>
+        <li class="nav-item">
+          <a href="/accounts/logout" class="nav-link">Logout</a>
+        </li>
+        <% } %>
+      </ul>
+    </div>
+  </nav>
+  <%- body %>
 
 
 
-<script src="/static/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

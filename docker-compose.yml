@@ -1,0 +1,45 @@
+version: '3.8'
+
+services : 
+    nginx-proxy :
+        image: nginx-proxy/dev:2.0
+        container_name: nginx-proxy
+        ports: 
+            - "80:80"
+        build: 
+            context: ./nginx_config/
+        restart: always
+        networks: 
+            - nginx-proxy
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+            - /etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+            - /etc/nginx/sites-enabled:/etc/nginx/sites-enabled
+            - /etc/nginx/sites-available:/etc/nginx/sites-available
+        command: bash
+        environment: 
+            - DEFAULT_HOST=swc.org,www.swc.org,host,localhost
+ 
+    swc :
+        image : swc_teams/dev:5.0
+        container_name: swc
+        build :
+            context: .
+        volumes: 
+            - /var/run/docker.sock:/var/run/docker.sock
+        networks :
+            - nginx-proxy 
+        restart: always
+        environment: 
+            - VIRTUAL_HOST=deploying.voldemort.wtf
+            - VIRTUAL_PORT=3000
+           
+    
+
+    
+networks: 
+    nginx-proxy:
+        external: true
+
+        
+        

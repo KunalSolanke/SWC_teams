@@ -11,7 +11,7 @@ db.on('error', (err) => {
     console.log(err)
 })
 db.on('open', () => {
-    console.log('Db is connected')
+    console.log('Db is connected'.underline.green)
 })
 
 module.exports = db 

@@ -1,14 +1,13 @@
 
-const {spawn} = require('child_process')
+const { spawn } = require('child_process')
 
 
+const multiplecommands = async (commands, blockName, callback, fallbackcommandArr = []) => {
 
-const multiplecommands = async (commands,blockName,callback,fallbackcommandArr=[])=>{
-
-    for(let i=0 ;i<commands.length ;i++){
-        let c=commands[i] ;
+    for (let i = 0; i < commands.length; i++) {
+        let c = commands[i];
         try {
-        await spawnCommand({"normal":c["command"]},c["name"],callback,fallbackcommandArr)
+            await spawnCommand(c["command"], c["name"], callback, fallbackcommandArr)
 
         } catch (err) {
             return callback(err, blockName)
@@ -20,32 +19,48 @@ const multiplecommands = async (commands,blockName,callback,fallbackcommandArr=[
 
 
 
-const cb = function (err,name, data="") {
+const cb = function (err, name, data = "") {
     if (err) {
-        console.log(err);
-        return ;
+        console.log(`${name}\nError`.bold.red, err);
+        return;
     }
-    console.log(`${name}\ndata ` + data +"\n")
+    console.log(`${name}\nSuccess:`.underline.green, + data + "\n")
 }
 
 
 
 
-const spawnCommand  = async(command,commandname,cb,fallbackcommandArr)=>{
-    console.log("running ",command.normal,commandname)
+const spawnCommand = async (command, commandname, cb, fallbackcommandArr) => {
+
+
+
+    if (!command.normal || command.normal == false) {
+        fallbackcommandArr.push({
+            "command": {
+                "normal": command.revert,
+            },
+            "name": `${commandname} revert`
+        })
+        return;
+    }
+    console.log("Running ".blink, command.normal, commandname)
+
     let child = spawn(command.normal, {
         shell: true,
     })
-    
+
     try {
         let data = await logger(child, commandname)
-        fallbackcommandArr.push({
-         "command":  command.revert,
-         "name" :`${commandname} revert`
-        })
+        if (command.revert) {
+            fallbackcommandArr.push({
+                "command": {
+                    "normal": command.revert,
+                },
+                "name": `${commandname} revert`
+            })
+        }
         cb(null, commandname, data)
     } catch (error) {
-        console.log(error , "error in", command.normal)
         return cb(error, commandname);
     }
 }
@@ -54,20 +69,20 @@ const spawnCommand  = async(command,commandname,cb,fallbackcommandArr)=>{
 
 
 
-const logger = async (child,name)=>{
+const logger = async (child, name) => {
 
-   
-  child.stderr.pipe(process.stderr)
-  child.stdout.pipe(process.stdout)
-  
+
+    child.stderr.pipe(process.stderr)
+    child.stdout.pipe(process.stdout)
+
     let data = "";
     for await (const chunk of child.stdout) {
-        console.log(`${name}\n stdout chunk: ` + chunk);
+        //console.log(`${name}\n output: ` + chunk);
         data += chunk;
     }
     let error = "";
     for await (const chunk of child.stderr) {
-        console.error(`${name}\n stderr chunk: ` + chunk);
+        //console.error(`${name}\n error: ` + chunk);
         error += chunk;
     }
     const exitCode = await new Promise((resolve, reject) => {
@@ -75,7 +90,7 @@ const logger = async (child,name)=>{
     });
 
     if (exitCode) {
-        throw new Error(`${name}\n subprocess error exit ${exitCode}, ${error}`);
+        throw new Error(`${name}\n Error`.bold.red + `${exitCode}, ${error}`);
     }
     return data;
 
@@ -87,18 +102,40 @@ const logger = async (child,name)=>{
 
 
 commands = {
-    "install": (pass,name) => `echo ${pass} | sudo -S apt-get install ${name}`,
-    "update": (pass)=>`echo ${pass} | sudo -S apt-get update`,
-    "mkdir": (name) => `mkdir ${name}`,
-    "cd": (path) => `cd ${path}`,
-    "pwd": "pwd",
-    "clone": (url, name) => `git clone ${url} ${name}`,
-    "changeinfile":(pass,old,new_entry,file,separator="/")=>{
-       // console.log(`echo ${pass} | sudo -S sed -i 's/${old}/${new_entry}/g' ${file}`)
-        return `echo ${pass} | sudo -S sed -i 's${separator}${old}${separator}${new_entry}${separator}g' ${file}`},
-    "executable" : (filename) =>`chmod +x ${filename}`,
-    "changeDirOwner":(pass,dir)=>`echo ${pass} | sudo -S chown -R $USER:$USER ${dir}`,
-    "giveReadWriteAccess": (pass,dir) => `echo ${pass} | sudo -S chmod -R 755 ${dir}`
+    "install": (pass, name) => {
+        let obj = {};
+        obj.normal = `echo ${pass} | sudo -S apt-get install ${name}`
+    },
+    "update": (pass) => {
+        let obj = {};
+        obj.normal = `echo ${pass} | sudo -S apt-get update`
+        return obj
+    },
+    "mkdir": (name) => {
+        let obj = {};
+        obj.normal = `mkdir ${name}`
+        return obj
+    },
+    "clone": (url, name) => {
+        let obj = {};
+        obj.normal = `git clone ${url} ${name}`
+        return obj;
+    },
+    "changeinfile": (pass, old, new_entry, file, separator = "/") => {
+        let obj = {}
+        obj.normal = `echo ${pass} | sudo -S sed -i 's${separator}${old}${separator}${new_entry}${separator}g' ${file}`;
+        return obj;
+    },
+    "executable": (filename) => {
+        let obj = {};
+        obj.normal = `chmod +x ${filename}`;
+        return obj;
+    },
+    "changeDirOwner": (pass, dir) => {
+        let obj = { "normal": `echo ${pass} | sudo -S chown -R $USER:$USER ${dir}` }
+        return obj;
+    },
+    "giveReadWriteAccess": (pass, dir) => `echo ${pass} | sudo -S chmod -R 755 ${dir}`
 }
 
 
@@ -107,12 +144,12 @@ commands = {
 
 
 
-module.exports ={
-    cb : cb,
-    logger : logger,
-    spawnCommand:spawnCommand,
-    commands : commands,
-    multiplecommands:multiplecommands
+module.exports = {
+    cb: cb,
+    logger: logger,
+    spawnCommand: spawnCommand,
+    commands: commands,
+    multiplecommands: multiplecommands
 }
 
 

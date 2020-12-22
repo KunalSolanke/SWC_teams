@@ -6,6 +6,7 @@ RUN mkdir -p /usr/src/app/src
 
 
 
+
 COPY ./src/package*.json /usr/src/app/src/
 RUN cd /usr/src/app/src && npm install
 COPY . /usr/src/app

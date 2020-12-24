@@ -6,9 +6,21 @@ const { Project } = require('../models/allModels')
 
 
 commands = {
-    "npmInstallAll": (path) => `cd ${path} && npm install`,
-    "npmInstallPackage": (path, name) => `npm install ${path} ${name}`,
-    "runserver": (path, name) => `node ${path}/${name}/index.js`
+    "npmInstallAll": (path) => {
+        let obj = {};
+        obj.normal = `cd ${path} && npm install`;
+        return obj;
+    },
+    "npmInstallPackage": (path, name) => {
+        let obj = {};
+        obj.normal = `npm install ${path} ${name}`;
+        return obj;
+    },
+    "runserver": (path, name) => {
+        let obj = {}
+        obj.normal = `node ${path}/${name}/index.js`;
+        return obj;
+    }
 }
 
 
@@ -90,11 +102,16 @@ const dockersetup = async (project, env) => {
     let dockerignorefile = env.projectDir + "/.dockerignore"
     setup = [
         {
-            "command": `cp docker_config/docker_node/Dockerfile ${dockerfilename}`,
+            "command": {
+                'normal': `cp docker_config/docker_node/Dockerfile ${dockerfilename}`,
+            },
             "name": "copy docker file"
         },
         {
-            "command": `cp docker_config/docker_node/.dockerignore ${dockerignorefile}`,
+            "command": {
+                "normal":
+                    `cp docker_config/docker_node/.dockerignore ${dockerignorefile}`
+            },
             "name": "copy docker file"
         },
         {
@@ -116,21 +133,27 @@ const saveconfigurations = (project, env) => {
     let dockerfilename = env.projectDir + "/Dockerfile";
 
     setup = [{
-        "command": `touch ${env.projectDir}/src/.env`,
+        "command": {
+            "normal": `touch ${env.projectDir}/src/.env`
+        },
         "name": "make .env file"
     }]
 
-    
+
 
     for (let config of project.configs) {
 
         setup.push({
-            "command": `echo \`${config.key} = ${config.value}\` >> ${env.projectDir}/src/.env`,
+            "command": {
+                "normal": `echo \`${config.key} = ${config.value}\` >> ${env.projectDir}/src/.env`
+            },
             "name": "make values to .env"
         })
 
         setup.push({
-            "command": `sed -i 's+#<ENV>+ENV ${config.key} ${config.value}\n#<ENV>+g' ${dockerfilename}`,
+            "command": {
+                "normal": `sed -i 's+#<ENV>+ENV ${config.key} ${config.value}\n#<ENV>+g' ${dockerfilename}`
+            },
             "name": "adding values to ENV"
         })
     }
@@ -147,19 +170,24 @@ const saveconfigurations = (project, env) => {
 const dockerBuild = async (project, env) => {
     let totalproject = Project.find({})
     let port = 3000 + totalproject.length;
-    let linked_containers="";
-    for (let db of project.databases){
-        linked_containers += `--link ${db.containername}` ;
+    let linked_containers = "";
+    for (let db of project.databases) {
+        linked_containers += `--link ${db.containername}`;
     }
-        setup = [{
-            "command": `cd ${env.projectDir} && ${docker.commands["dockerBuildContext"](project.name, project.version)}`,
-            "name": "docker build image"
+
+    setup = [{
+        "command": {
+            "normal": `cd ${env.projectDir} && ${docker.commands["dockerBuildContext"](project.name, project.version).normal}`,
+            "revert" :docker.commands["remove"]("image",project.name).normal 
         },
-        {
-            "command": docker.commands["dockerRun"](project.name, port, 3000, name,addstring),
-            "name": "docker run"
-        }
-        ]
+        "name": "docker build image"
+    },
+    {
+        "command": docker.commands["dockerRun"](`docker run -dit --rm -e VIRTUAL_HOST =deploying.voldemort.wtf -e VIRTUAL_PORT =3000 --name ${project.name} --net nginx-proxy -p ${port}:3000 ${project.name}:${project.version}`),
+        "name": "docker run"
+    }
+    
+    ]
 
     project.port = port;
     project.save()
@@ -201,35 +229,42 @@ const deploy = async (project) => {
         {
             "command": utils.commands["clone"](link, env.projectDir + "/src"),
             "name": "clone repo"
-        }
+        },
 
     ]
 
-    let fallbackArr =[] ;
+    let fallbackArr = [];
 
-    try{
 
-            await utils.multiplecommands(basicsetup, "NODE SETUP", utils.cb,fallbackArr)
 
-            //docker
-            await utils.multiplecommands(dockersetup(project, env), "DOCKER SETUP", utils.cb,fallbackArr)
+    try {
 
-            //save configurations 
-            await utils.multiplecommands(saveconfigurations(project, env), "DOCKER SETUP", utils.cb,fallbackArr)
+        fallbackArr.push({
+            "command": {
+                "normal": `rm -rf ${env.projectDir}`
+            },
+            "name": "There is a error in deploying hence removing project dir"
+        });
 
-            //docker 
-            await utils.multiplecommands(dockerBuild(project, env), "DOCKER BUILD", utils.cb,fallbackArr)
+        await utils.multiplecommands(basicsetup, "NODE SETUP", utils.cb, fallbackArr)
 
-            //start process manager
-            //  await utils.multiplecommands(pm2Node(project,env), "PM2 NODE SETUP", utils.cb)
+        //docker
+        await utils.multiplecommands(dockersetup(project, env), "DOCKER SETUP", utils.cb, fallbackArr)
 
-            //start nginx
-            await utils.multiplecommands(nginxNode(project, env), "NGINX NODE SETUP", utils.cb,fallbackArr) ;
-            
+        //save configurations 
+        await utils.multiplecommands(saveconfigurations(project, env), "DOCKER SETUP", utils.cb, fallbackArr)
+       
+         
+        //docker 
+        await utils.multiplecommands(dockerBuild(project, env), "DOCKER BUILD", utils.cb, fallbackArr)
+
+     
+       // await utils.multiplecommands(nginxNode(project, env), "NGINX NODE SETUP", utils.cb, fallbackArr);
+
     } catch (err) {
-        console.log("reverting changes", err)
+        console.log("Reverting changes".bgBlue, err)
         await utils.multiplecommands(fallbackArr, "mongo db creation block ", (err, name) => {
-            console.log(err)
+            console.log("Error while reverting changes".blink+name+"\n"+err);
         });
         if (err) throw err;
     }

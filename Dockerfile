@@ -4,7 +4,6 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 
-
 COPY package*.json ./
 RUN  npm install
 COPY . .
@@ -23,11 +22,8 @@ RUN apt-get update && \
     apt-get -y install docker-ce
 
 
-ARG DATABASE_URI
-ENV DATABASE_URI ${DATABASE_URI}
-
-
 EXPOSE 3000
 
 CMD ["npm","run","dev"]
+
 

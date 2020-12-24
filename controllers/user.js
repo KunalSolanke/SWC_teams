@@ -1,10 +1,10 @@
-const passport = require('passport') ; 
-const isLoggedin = require('../middlewares/auth') ;
+const passport = require('passport');
+const isLoggedin = require('../middlewares/auth');
 
 
 
 
-exports.getMyProjects = async (req,res)=>{
+exports.getMyProjects = async (req, res) => {
     res.render("projects")
 }
 
@@ -12,8 +12,8 @@ exports.getMyProjects = async (req,res)=>{
 
 // Handling user signup -login
 
-exports.logout = (req,res)=>{
-    if(req.user){
+exports.logout = (req, res) => {
+    if (req.user) {
         req.logout()
     }
     res.setHeader("Content-Type", "text/html")
@@ -29,8 +29,8 @@ exports.getSignup = function (req, res) {
 
 
 exports.postSignup = function (req, res) {
-   let {username,email,password} = req.body ;
-    User.register(new User({ username: username,email:email }),
+    let { username, email, password } = req.body;
+    User.register(new User({ username: username, email: email }),
         password, function (err, user) {
             if (err) {
                 console.log(err);
@@ -39,7 +39,7 @@ exports.postSignup = function (req, res) {
 
             passport.authenticate("local")(
                 req, res, function () {
-			res.redirect('/project/create');
+                    res.redirect('/project/create');
                 });
         });
 };
@@ -51,26 +51,26 @@ exports.postSignup = function (req, res) {
 
 exports.getLogin = function (req, res) {
     res.render("login");
-} ;
+};
 
 
 
 //Handling user login 
 exports.postLogin = passport.authenticate("local", {
-	successRedirect: "/project/create",
+    successRedirect: "/project/create",
     failureRedirect: "/accounts/login"
 }), function (req, res) {
     console.log(req.user)
-}; 
+};
 
 
 
-exports.getProfile = async(req,res) =>{
-	res.send("under construction") ;
+exports.getProfile = async (req, res) => {
+    res.send("under construction");
 }
 
-exports.postProfile = async (req,res)=> {
-	res.send("under construction") ;
+exports.postProfile = async (req, res) => {
+    res.send("under construction");
 }
 
 

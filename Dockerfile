@@ -4,7 +4,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 
-VOLUME /var/run/docker.sock  /var/run/docker.sock
+
 COPY package*.json ./
 RUN  npm install
 COPY . .

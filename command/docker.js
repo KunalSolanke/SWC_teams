@@ -2,6 +2,7 @@ const utils = require('../utilities.js');
 const { Database } = require('../models/allModels.js')
 
 
+
 let commands = {
     "createVolume": (name) => {
         let obj = {}
@@ -127,7 +128,6 @@ dockerimages = {
 
         console.log(database.configs, database);
         database.configs.push({ key: "DATABASE_URI", value: `${containername}:${port}` })
-        database
 
         project.databases.push(database._id)
         project.config_vars.push({ key: "DATABASE_URI", value: `${containername}:${port}` })

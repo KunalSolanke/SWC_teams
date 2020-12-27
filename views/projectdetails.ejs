@@ -69,7 +69,7 @@
     </div>
     <div class="col-lg-8">
       <!--start-->
-     
+
       <form id="databases_form" class="project_id" data_project_id="<%= project._id %>">
         <div class="row customcontainer align-items-center">
           <div class="col-lg-4 col-md-4 col-sm-6 d-flex flex-row justify-content-center">
@@ -146,48 +146,53 @@
     </div>
     <div class="col col-lg-8 text-center" id="configurations">
       <% project.config_vars.forEach(function(config,idx){ %>
-          <form id="config-form-<%= idx+1 %>" style="margin-bottom: 12px;">
-            <div class="row form-row align-items-center">
-                  <div class="col col-lg-5">
-                    <label class="sr-only" for="inlineFormInput">Name</label>
-                    <input type="text" class="form-control mb-2 text-white" style="background-color:#3d3d48" id="key" name="key"
-                      placeholder="Key" required value="<%= config.key %>" disabled data_id="key_<%= idx+1 %>"/>
-                  </div>
-                  <div class="col col-lg-5">
-                    <label class="sr-only" for="inlineFormInput">Name</label>
-                    <input type="text" class="form-control mb-2 text-white" style="background-color:#3d3d48" id="value"
-                      name="value" placeholder="value" required value="<%= config.value %>" disabled data_id="value_<%= idx+1 %>" />
-                  </div>
-                  <div class="col col-lg-1">
-                      <button type="button"  data_id ="pencil_<%= idx+1 %>" data-bs-toggle="modal" data-bs-target="#updateModal" data-whatever="@mdo" class="btn btn-secondary mb-2 pencil" id="pencil"><i class="fa fa-1x fa-pencil" aria-hidden="true"></i>
-                      </button>
-                  </div>
-                  <div class="col col-lg-1">
-                    <button type="button" data_id ="cross_<%= idx+1 %>" data-bs-toggle="modal" data-bs-target="#closeModal" data-whatever="@Hi" class="btn btn-secondary mb-2 cross" id="cross"><i class="fa fa-times" aria-hidden="true"></i></button>
-                  </div>
-            </div>
-          </form>
-      <% }) %>
-      <form  style="margin-bottom: 12px;">
+      <form id="config-form-<%= idx+1 %>" style="margin-bottom: 12px;">
         <div class="row form-row align-items-center">
-              <div class="col col-lg-5">
-                <label class="sr-only" for="inlineFormInput">Name</label>
-                <input type="text" class="form-control mb-2 text-white" style="background-color:#3d3d48" id="key" name="key"
-                  placeholder="Key" required  />
-              </div>
-              <div class="col col-lg-5">
-                <label class="sr-only" for="inlineFormInput">Name</label>
-                <input type="text" class="form-control mb-2 text-white" style="background-color:#3d3d48" id="value"
-                  name="value" placeholder="value" />
-              </div>
-              <div id="addbtn-container" class="col-lg-2">
-                <button id="add" type="submit" class="btn btn-secondary mb-2">Add</button>
-              </div>
+          <div class="col col-lg-5">
+            <label class="sr-only" for="inlineFormInput">Name</label>
+            <input type="text" class="form-control mb-2 text-white" style="background-color:#3d3d48" id="key" name="key"
+              placeholder="Key" required value="<%= config.key %>" disabled data_id="key_<%= idx+1 %>" />
+          </div>
+          <div class="col col-lg-5">
+            <label class="sr-only" for="inlineFormInput">Name</label>
+            <input type="text" class="form-control mb-2 text-white" style="background-color:#3d3d48" id="value"
+              name="value" placeholder="value" required value="<%= config.value %>" disabled
+              data_id="value_<%= idx+1 %>" />
+          </div>
+          <div class="col col-lg-1">
+            <button type="button" data_id="pencil_<%= idx+1 %>" data-bs-toggle="modal" data-bs-target="#updateModal"
+              data-whatever="@mdo" class="btn btn-secondary mb-2 pencil" id="pencil"><i class="fa fa-1x fa-pencil"
+                aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="col col-lg-1">
+            <button type="button" data_id="cross_<%= idx+1 %>" data-bs-toggle="modal" data-bs-target="#closeModal"
+              data-whatever="@Hi" class="btn btn-secondary mb-2 cross" id="cross"><i class="fa fa-times"
+                aria-hidden="true"></i></button>
+          </div>
+        </div>
+      </form>
+      <% }) %>
+      <form style="margin-bottom: 12px;">
+        <div class="row form-row align-items-center">
+          <div class="col col-lg-5">
+            <label class="sr-only" for="inlineFormInput">Name</label>
+            <input type="text" class="form-control mb-2 text-white" style="background-color:#3d3d48" id="key" name="key"
+              placeholder="Key" required />
+          </div>
+          <div class="col col-lg-5">
+            <label class="sr-only" for="inlineFormInput">Name</label>
+            <input type="text" class="form-control mb-2 text-white" style="background-color:#3d3d48" id="value"
+              name="value" placeholder="value" />
+          </div>
+          <div id="addbtn-container" class="col-lg-2">
+            <button id="add" type="submit" class="btn btn-secondary mb-2">Add</button>
+          </div>
         </div>
       </form>
     </div>
   </div>
-  </div>
+</div>
 <center>
   <div style="height:1px; width:80%; background-color:grey;" class="container text-white"></div>
 </center>
@@ -206,9 +211,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h6 class="modal-title" id="exampleModalLabel">Update config var</h5>
-        <button type="button" data-bs-dismiss="modal" aria-label="Close"
-          class="btn btn-secondary cross"><i class="fa fa-times" aria-hidden="true"></i>
-        </button>
+          <button type="button" data-bs-dismiss="modal" aria-label="Close" class="btn btn-secondary cross"><i
+              class="fa fa-times" aria-hidden="true"></i>
+          </button>
       </div>
       <div class="modal-body">
         <form id="updateModal_form">
@@ -218,10 +223,10 @@
           </div>
           <div class="form-group">
             <label for="message-text" class="col-form-label">Value</label>
-            <input type="text" class="form-control"  id="config_update_modal_value" name="value"></textarea>
+            <input type="text" class="form-control" id="config_update_modal_value" name="value"></textarea>
           </div>
         </form>
-      </div>  
+      </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary hideUpdateModal" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-info" id="updateConfigSave">Update</button>
@@ -238,19 +243,20 @@
     <div class="modal-content">
       <div class="modal-header">
         <h6 class="modal-title" id="exampleModalLabel">Delete the config var??</h5>
-        <button type="button" data-bs-dismiss="modal" aria-label="Close" class="btn btn-secondary cross"><i
-            class="fa fa-times" aria-hidden="true"></i>
-        </button>
+          <button type="button" data-bs-dismiss="modal" aria-label="Close" class="btn btn-secondary cross"><i
+              class="fa fa-times" aria-hidden="true"></i>
+          </button>
       </div>
       <div class="modal-body">
         <form id="closeModal_form">
           <div class="form-group">
-            <label for="recipient-name" class="col-form-label" aria-disabled="true"  >Key</label>
-            <input type="text" class="form-control"  id="config_del_modal_key" disabled name="key" data_id ="key_1">
+            <label for="recipient-name" class="col-form-label" aria-disabled="true">Key</label>
+            <input type="text" class="form-control" id="config_del_modal_key" disabled name="key" data_id="key_1">
           </div>
           <div class="form-group">
             <label for="message-text" class="col-form-label">Value</label>
-            <input type="text" class="form-control"   id="config_del_modal_value" aria-disabled="true" name="value" disabled data_id ="value_1"></textarea>
+            <input type="text" class="form-control" id="config_del_modal_value" aria-disabled="true" name="value"
+              disabled data_id="value_1"></textarea>
           </div>
         </form>
       </div>

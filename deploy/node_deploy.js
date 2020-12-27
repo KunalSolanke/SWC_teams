@@ -72,6 +72,17 @@ const saveconfigurations = (project, env) => {
   return setup;
 };
 
+const getprojectEnv = (project) => {
+  const serverBasePath = process.env.SERVER_BASE_PATH;
+  const mainfile = project.config_vars.filter(x=>x.key=='mainfile')[0].value;
+  console.log(serverBasePath)
+  return {
+    server_username: process.env.SERVER_USERNAME,
+    projectDir: serverBasePath + project.name,
+    mainfile
+  };
+};
+
 const dockerBuild = async (project, env) => {
   let totalproject = await Project.find({});
   let port = 3000 + totalproject.length;
@@ -99,7 +110,7 @@ const dockerBuild = async (project, env) => {
           env.projectDir
         }/src/.env --name ${project.name.toLowerCase()} --net nginx-proxy -p ${port}:3000 ${project.name.toLowerCase()}/test:${
           project.version
-        }.0 node /usr/src/app/src/app.js`
+        }.0 node /usr/src/app/src/${env.mainfile}`
       ),
       name: "docker run",
     },
@@ -110,17 +121,9 @@ const dockerBuild = async (project, env) => {
   return setup;
 };
 
-const getprojectEnv = async (project) => {
-  const serverBasePath = process.env.SERVER_BASE_PATH;
-  return {
-    server_username: process.env.SERVER_USERNAME,
-    projectDir: serverBasePath + project.name,
-  };
-};
-
 const intialSetup = async (project) => {
   const env = getprojectEnv(project);
-
+  console.log("env",env)
   let basicsetup = [
     {
       command: utils.commands["mkdir"](`-p ${env.projectDir}`),
@@ -158,13 +161,6 @@ const intialSetup = async (project) => {
     //docker
     await utils.multiplecommands(
       await dockersetup(project, env),
-      "DOCKER SETUP",
-      utils.cb,
-      fallbackArr
-    );
-    //env file
-    await utils.multiplecommands(
-      await saveconfigurations(project, env),
       "DOCKER SETUP",
       utils.cb,
       fallbackArr
@@ -285,6 +281,13 @@ const deploy = async (project) => {
   const env = getprojectEnv(project);
   let fallbackArr = [];
   try {
+  //env file
+   await utils.multiplecommands(
+    await saveconfigurations(project, env),
+    "DOCKER SETUP",
+    utils.cb,
+    fallbackArr
+  );
     await utils.multiplecommands(
       await dockerBuild(project, env),
       "DOCKER BUILD",

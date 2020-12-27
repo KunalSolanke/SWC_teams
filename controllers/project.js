@@ -2,6 +2,8 @@ const { Project } = require("../models/allModels");
 const { images } = require("../command/docker.js");
 const allDeploy = require("../deploy/all_deploy.js");
 const { postProfile } = require("./user");
+const fs = require('fs');
+const utilities = require("../utilities");
 
 //post request for create project page with initial page info
 exports.postCreateProject = async (req, res) => {
@@ -18,6 +20,12 @@ exports.postCreateProject = async (req, res) => {
       domain: domain,
       version: 1,
     });
+    project.config_vars.concat([
+      {
+        key:'mainfile',
+        value:'index.js'
+      }
+    ])
     await project.save(function (err) {
       console.log(err);
     });
@@ -52,7 +60,6 @@ exports.getProject = function (req, res) {
         formname: "postgres",
       },
     ];
-
     res.render("projectdetails", { project: project, databases: databases });
   });
 };
@@ -64,8 +71,6 @@ exports.postDatabase = async (req, res) => {
   await project.populate("user").execPopulate();
   await project.populate("databases").execPopulate();
 
-  {
-  }
   console.log(req.body);
   for (const [k, v] of Object.entries(req.body)) {
     if (k == "DBCONFIGURED") {
@@ -105,8 +110,6 @@ exports.postConfig = async (req, res) => {
       },
     ]);
     await project.save();
-    let appToDeploy = allDeploy.default["node"];
-    await appToDeploy.saveEnv({key,value});
     res.json({
       success: true,
       message: "configuration update",
@@ -130,8 +133,6 @@ exports.updateConfig = async (req, res) => {
     });
 
     await project.save();
-    let appToDeploy = allDeploy.default["node"];
-    await appToDeploy.updateEnv({key,value});
     res.json({
       success: true,
       message: "configuration update",
@@ -144,6 +145,7 @@ exports.updateConfig = async (req, res) => {
   }
 };
 
+
 exports.deleteConfig = async (req, res) => {
   let { key, value } = req.body;
   const projectId = req.params.id;
@@ -154,8 +156,6 @@ exports.deleteConfig = async (req, res) => {
     });
 
     await project.save();
-    let appToDeploy = allDeploy.default["node"];
-    await appToDeploy.updateEnv({key,value}, "del");
     res.json({
       success: true,
       message: "configuration update",

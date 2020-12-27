@@ -2,13 +2,12 @@
 const { spawn } = require('child_process')
 
 
-const multiplecommands = async (commands, blockName, callback, fallbackcommandArr = []) => {
 
+const multiplecommands = async (commands, blockName, callback, fallbackcommandArr = []) => {
     for (let i = 0; i < commands.length; i++) {
         let c = commands[i];
         try {
             await spawnCommand(c["command"], c["name"], callback, fallbackcommandArr)
-
         } catch (err) {
             return callback(err, blockName)
         }
@@ -22,7 +21,7 @@ const multiplecommands = async (commands, blockName, callback, fallbackcommandAr
 const cb = function (err, name, data = "") {
     if (err) {
         console.log(`${name}\nError`.bold.red, err);
-        return;
+        throw new Error(err) ;
     }
     console.log(`${name}\nSuccess:`.underline.green, + data + "\n")
 }
@@ -43,7 +42,7 @@ const spawnCommand = async (command, commandname, cb, fallbackcommandArr) => {
         })
         return;
     }
-    console.log("Running ".blink, command.normal, commandname)
+    console.log("Running ".cyan, command.normal, commandname)
 
     let child = spawn(command.normal, {
         shell: true,

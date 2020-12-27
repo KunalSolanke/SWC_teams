@@ -8,13 +8,13 @@ const { postProfile } = require('./user');
 
 
 //post request for create project page with initial page info 
-exports.postCreateProject = function (req, res) {
+exports.postCreateProject = async (req, res)=> {
     let { name, link, platform, domain } = req.body;
     if (domain === "") {
         domain = name + '.voldemort.wtf'
     }
-    let project = new Project({ name: name, repoUrl: link, user: req.user._id, platform: platform, domain: domain, version: 1 })
-    project.save(function (err) {
+    let project = await new Project({ name: name, repoUrl: link, user: req.user._id, platform: platform, domain: domain, version: 1 })
+    await project.save(function (err) {
         console.log(err)
     })
 
@@ -213,7 +213,9 @@ exports.deleteConfig = async (req, res) => {
 //finally deploy the project with above configurations
 exports.postProject = async (req, res) => {
     const projectId = req.params.id;
-    const project = await Project.findById(projectId).populated('user').populate('databases').execPopulate();
+    const project = await Project.findById(projectId);
+    await project.populate('databases').execPopulate() ;
+    await project.populate('user').execPopulate()
     if (!project.databaseConfigured) {
         res.send("can't deploy")
     }

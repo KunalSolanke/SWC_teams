@@ -108,7 +108,7 @@ dockerimages = {
         try {
             await utils.spawnCommand(commands["createVolume"](volumeName), "create mongo vol ", utils.cb, fallbackArr);
             await utils.spawnCommand(commands["createVolume"](volumeConfig), "create mongo config vol ", utils.cb, fallbackArr);
-            await utils.spawnCommand(commands['dockerRun'](`-dit --rm --name ${containername} -p ${port}:27017 mongo`, containername), `mongo container ${project.name}`, utils.cb, fallbackArr)
+            await utils.spawnCommand(commands['dockerRun'](`-dit --rm --name ${containername} --net nginx-proxy -p ${port}:27017 mongo`, containername), `mongo container ${project.name}`, utils.cb, fallbackArr)
 
         } catch (err) {
             console.log("reverting changes", err)
@@ -126,11 +126,11 @@ dockerimages = {
 
 
         console.log(database.configs, database);
-        database.configs.push({ key: "DATABASE_URI", value: `${containername}:${port}` })
+        database.configs.push({ key: "MONGO_URI", value: `mongodb://${containername}:27017/${project.name}` })
         database
 
         project.databases.push(database._id)
-        project.config_vars.push({ key: "DATABASE_URI", value: `${containername}:${port}` })
+        project.config_vars.push({ key: "MONGO_URI", value: `mongodb://${containername}:27017/${project.name}` })
         project.save()
     }
 

@@ -290,7 +290,7 @@ addbtn.addEventListener('click', (e) => configFnadd(e))
 deploybtn.addEventListener('click', (e) => {
   e.preventDefault();
   const projectId = databaseForm.getAttribute("data_project_id");
-  fetch(`/project/${projectId}/deploy/`, {
+  fetch(`/project/${projectId}/`, {
     method: "post",
     body: JSON.stringify({}),
     headers: {

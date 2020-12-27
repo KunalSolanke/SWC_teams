@@ -100,24 +100,21 @@ const dockersetup = async (project, env) => {
 
     let dockerfilename = env.projectDir + "/Dockerfile"
     let dockerignorefile = env.projectDir + "/.dockerignore"
+    console.log("here")
     setup = [
         {
             "command": {
-                'normal': `cp docker_config/docker_node/Dockerfile ${dockerfilename}`,
+                'normal': `cp ./docker_config/docker_node/Dockerfile ${dockerfilename}`,
             },
             "name": "copy docker file"
         },
         {
             "command": {
                 "normal":
-                    `cp docker_config/docker_node/.dockerignore ${dockerignorefile}`
+                    `cp ./docker_config/docker_node/.dockerignore ${dockerignorefile}`
             },
             "name": "copy docker file"
         },
-        {
-            "command": utils.commands["changeinfile"](env.pass, '<main-file>', 'index.js', dockerfilename),
-            "name": "change docker file"
-        }
     ]
 
 
@@ -141,21 +138,21 @@ const saveconfigurations = (project, env) => {
 
 
 
-    for (let config of project.configs) {
+    for (let config of project.config_vars) {
 
         setup.push({
             "command": {
-                "normal": `echo \`${config.key} = ${config.value}\` >> ${env.projectDir}/src/.env`
+                "normal": "echo "+config.key+"="+config.value+`>> ${env.projectDir}/src/.env`
             },
             "name": "make values to .env"
         })
 
-        setup.push({
-            "command": {
-                "normal": `sed -i 's+#<ENV>+ENV ${config.key} ${config.value}\n#<ENV>+g' ${dockerfilename}`
-            },
-            "name": "adding values to ENV"
-        })
+        // setup.push({
+        //     "command": {
+        //         "normal": `sed -i 's+#<ENV>+ENV ${config.key} ${config.value}\n#<ENV>+g' ${dockerfilename}`
+        //     },
+        //     "name": "adding values to ENV"
+        // })
     }
 
 
@@ -168,22 +165,22 @@ const saveconfigurations = (project, env) => {
 
 
 const dockerBuild = async (project, env) => {
-    let totalproject = Project.find({})
+    let totalproject = await Project.find({})
     let port = 3000 + totalproject.length;
     let linked_containers = "";
     for (let db of project.databases) {
         linked_containers += `--link ${db.containername}`;
     }
-
+   
     setup = [{
         "command": {
-            "normal": `cd ${env.projectDir} && ${docker.commands["dockerBuildContext"](project.name, project.version).normal}`,
+            "normal": `cd ${env.projectDir} && ${docker.commands["dockerBuildContext"](project.version+".0", project.name.toLowerCase()+"/test").normal}`,
             "revert" :docker.commands["remove"]("image",project.name).normal 
         },
         "name": "docker build image"
     },
     {
-        "command": docker.commands["dockerRun"](`docker run -dit --rm -e VIRTUAL_HOST =deploying.voldemort.wtf -e VIRTUAL_PORT =3000 --name ${project.name} --net nginx-proxy -p ${port}:3000 ${project.name}:${project.version}`),
+        "command": docker.commands["dockerRun"](`-i --rm -e VIRTUAL_HOST=localhost -e VIRTUAL_PORT=3000 --env-file ${env.projectDir}/src/.env --name ${project.name.toLowerCase()} --net nginx-proxy -p ${port}:3000 ${project.name.toLowerCase()}/test:${project.version}.0 node /usr/src/app/src/app.js`),
         "name": "docker run"
     }
     
@@ -212,7 +209,7 @@ const deploy = async (project) => {
     const env = {
         pass: process.env.SERVER_PASSWORD,
         server_username: process.env.SERVER_USERNAME,
-        projectDir: serverBasePath + name
+        projectDir: serverBasePath + project.name
     }
 
 
@@ -227,7 +224,7 @@ const deploy = async (project) => {
             "name": "make project dir"
         },
         {
-            "command": utils.commands["clone"](link, env.projectDir + "/src"),
+            "command": utils.commands["clone"](project.repoUrl, env.projectDir + "/src"),
             "name": "clone repo"
         },
 
@@ -249,14 +246,14 @@ const deploy = async (project) => {
         await utils.multiplecommands(basicsetup, "NODE SETUP", utils.cb, fallbackArr)
 
         //docker
-        await utils.multiplecommands(dockersetup(project, env), "DOCKER SETUP", utils.cb, fallbackArr)
+        await utils.multiplecommands(await dockersetup(project, env), "DOCKER SETUP", utils.cb, fallbackArr)
 
         //save configurations 
-        await utils.multiplecommands(saveconfigurations(project, env), "DOCKER SETUP", utils.cb, fallbackArr)
+        await utils.multiplecommands(await saveconfigurations(project, env), "DOCKER SETUP", utils.cb, fallbackArr)
        
          
         //docker 
-        await utils.multiplecommands(dockerBuild(project, env), "DOCKER BUILD", utils.cb, fallbackArr)
+        await utils.multiplecommands(await dockerBuild(project, env), "DOCKER BUILD", utils.cb, fallbackArr)
 
      
        // await utils.multiplecommands(nginxNode(project, env), "NGINX NODE SETUP", utils.cb, fallbackArr);

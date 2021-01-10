@@ -19,13 +19,13 @@ exports.postCreateProject = async (req, res) => {
       platform: platform,
       domain: domain,
       version: 1,
+      config_vars:[
+        {
+          key:'mainfile',
+          value:'index.js'
+        }
+      ]
     });
-    project.config_vars.concat([
-      {
-        key:'mainfile',
-        value:'index.js'
-      }
-    ])
     await project.save(function (err) {
       console.log(err);
     });
